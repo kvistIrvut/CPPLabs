@@ -8,7 +8,7 @@
 #include "Containers/Config.hpp"
 
 namespace {
-const char *vertex_shader_source = R"(
+constexpr const char *vertex_shader_source = R"(
 #version 330 core
 
 layout (location = 0) in vec2 aPos;
@@ -22,7 +22,7 @@ void main() {
 }
 )";
 
-const char *fragment_shader_source = R"(
+constexpr const char *fragment_shader_source = R"(
 #version 330 core
 
 in vec3 vertexColor;
@@ -33,7 +33,7 @@ void main() {
 }
 )";
 
-const std::array<Color, COLOR_COUNT> CELL_COLORS = {
+constexpr std::array<Color, COLOR_COUNT> CELL_COLORS = {
         Color{0.90f, 0.20f, 0.25f},
         Color{0.20f, 0.65f, 0.95f},
         Color{0.25f, 0.80f, 0.35f},
@@ -264,19 +264,19 @@ void Renderer::addText(std::vector<Vertex> &vertices,
 }
 
 void Renderer::buildBoardVertices(const Board &board, std::vector<Vertex> &vertices) {
-    const float gap = 4.0f;
+    constexpr float gap = 4.0f;
 
     for (int row = 0; row < BOARD_ROWS; row++) {
         for (int col = 0; col < BOARD_COLS; col++) {
-            const Cell &cell = board.getCell(row, col);
+            const GameElement *cell = board.getCell(row, col);
 
-            if (cell.color_index == EMPTY_CELL) {
+            if (!cell) {
                 continue;
             }
 
             float x = BOARD_OFFSET_X + col * CELL_SIZE;
             float y = BOARD_OFFSET_Y + row * CELL_SIZE;
-            Color cell_color = CELL_COLORS[cell.color_index];
+            Color cell_color = CELL_COLORS[cell->getColorIndex()];
 
             addRectangle(vertices,
                          x + gap,
@@ -285,7 +285,7 @@ void Renderer::buildBoardVertices(const Board &board, std::vector<Vertex> &verti
                          CELL_SIZE - gap * 2.0f,
                          cell_color);
 
-            if (cell.selected) {
+            if (cell->isSelected()) {
                 addRectangle(vertices,
                              x + 12.0f,
                              y + 12.0f,
@@ -306,8 +306,8 @@ void Renderer::buildInterfaceVertices(std::vector<Vertex> &vertices,
                                       const std::string &state_text) {
     float score_progress_clamped = clamp01(score_progress);
 
-    const float frame_padding = 10.0f;
-    const float frame_thickness = 8.0f;
+    constexpr float frame_padding = 10.0f;
+    constexpr float frame_thickness = 8.0f;
 
     float frame_x = BOARD_OFFSET_X - frame_padding;
     float frame_y = BOARD_OFFSET_Y - frame_padding;
@@ -319,8 +319,8 @@ void Renderer::buildInterfaceVertices(std::vector<Vertex> &vertices,
     addRectangle(vertices, frame_x, frame_y, frame_thickness, frame_height, state_color);
     addRectangle(vertices, frame_x + frame_width - frame_thickness, frame_y, frame_thickness, frame_height, state_color);
 
-    const float bar_height = 18.0f;
-    const float bar_y_score = 52.0f;
+    constexpr float bar_height = 18.0f;
+    constexpr float bar_y_score = 52.0f;
 
     Color text_color{0.92f, 0.94f, 1.0f};
     Color bar_background{0.18f, 0.19f, 0.23f};

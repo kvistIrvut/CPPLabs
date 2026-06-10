@@ -190,17 +190,24 @@ void Game::handleCellClick(const int &row, const int &col) {
     }
 
     if (Board::areAdjacent(this->m_selected_row, this->m_selected_col, row, col)) {
-        this->m_board.swapCells(this->m_selected_row, this->m_selected_col, row, col);
-        clearSelection();
+        int first_row = this->m_selected_row;
+        int first_col = this->m_selected_col;
 
-        this->m_moves++;
+        clearSelection();
+        this->m_board.swapCells(first_row, first_col, row, col);
+
         int destroyed = this->m_board.processCascades(true);
         this->m_last_destroyed = destroyed;
 
-        if (destroyed > 0) {
-            int gained_score = destroyed * SCORE_PER_DESTROYED_CELL;
-            this->m_score += gained_score;
+        if (destroyed == 0) {
+            this->m_board.swapCells(first_row, first_col, row, col);
+            return;
         }
+
+        this->m_moves++;
+
+        int gained_score = destroyed * SCORE_PER_DESTROYED_CELL;
+        this->m_score += gained_score;
 
         updateGameState();
         return;
